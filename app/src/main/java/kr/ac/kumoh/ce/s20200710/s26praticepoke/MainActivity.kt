@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -26,6 +27,8 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.model.Pokemon
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.repository.MockPokemonRepository
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.repository.PokemonRepository
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.ui.theme.S26PraticePokeTheme
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonListViewModel
@@ -50,16 +53,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val repository: PokemonRepository = MockPokemonRepository()
+
         setContent {
             S26PraticePokeTheme {
-                MainScreen()
+                MainScreen(repository)
             }
         }
     }
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    repository: PokemonRepository
+) {
     val backStack = rememberNavBackStack(PokemonRoute.PokemonList)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -70,20 +78,24 @@ fun MainScreen() {
             entryDecorators = listOf(
                 // Add the default decorators for managing scenes and saving state
                 rememberSaveableStateHolderNavEntryDecorator(),
+                // Then add the view model store decorator
+                // 이걸 안쓰면 처음 한 번만 viewmodel 생성
+                rememberViewModelStoreNavEntryDecorator()
             ),
             entryProvider = entryProvider {
                 entry<PokemonRoute.PokemonList> {
                     PokemonListScreen(
-
-                        //viewmodel에서 pokemonlist를 만들어서 필요가 없어짐
-                        //pokemonList = pokemons,
+                        repository = repository,
                         onNavigateToDetail = { id ->
                             backStack.add(PokemonRoute.PokemonDetail(pokemonId = id))
                         }
                     )
                 }
                 entry<PokemonRoute.PokemonDetail> { key ->
-                    PokemonDetailScreen(key.pokemonId)
+                    PokemonDetailScreen(
+                        pokemonId = key.pokemonId,
+                        repository = repository,
+                    )
                 }
             }
         )
@@ -91,9 +103,11 @@ fun MainScreen() {
 }
 @Composable
 fun PokemonListScreen(
-    //pokemonList: List<Pokemon>,
+    repository: PokemonRepository,
+    viewModel: PokemonListViewModel = viewModel {
+        PokemonListViewModel(repository)
+    },
     onNavigateToDetail: (Int) -> Unit,
-    viewModel: PokemonListViewModel = viewModel()
 ) {
     //1. 이렇게 하면 list목록 자체가 아니라, StateFlow를 가져온다.
     //val pokemonList = viewModel.pokemonList
@@ -116,9 +130,12 @@ fun PokemonListScreen(
 @Composable
 fun PokemonDetailScreen(
     pokemonId: Int,
-    //viewModel: PokemonDetailViewModel = viewModel(),
+    repository: PokemonRepository,
     viewModel: PokemonDetailViewModel = viewModel {
-        PokemonDetailViewModel(pokemonId)
+        PokemonDetailViewModel(
+            repository = repository,
+            pokemonId = pokemonId
+        )
     }
 ){
 //    //viewmodel를 만든후, 검색함수를 호출할때 id 전달
