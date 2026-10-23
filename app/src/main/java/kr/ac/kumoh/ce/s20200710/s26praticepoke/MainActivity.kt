@@ -29,18 +29,20 @@ import kotlinx.serialization.Serializable
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.model.Pokemon
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.repository.MockPokemonRepository
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.repository.PokemonRepository
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.ui.screen.PokemonDetailScreen
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.ui.screen.PokemonListScreen
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.ui.theme.S26PraticePokeTheme
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonListViewModel
 import java.util.Map.entry
-
-sealed interface PokemonRoute : NavKey {
-    @Serializable
-    data object PokemonList : PokemonRoute
-
-    @Serializable
-    data class PokemonDetail(val pokemonId: Int) : PokemonRoute
-}
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.navigation.PokemonRoute
+//sealed interface PokemonRoute : NavKey {
+//    @Serializable
+//    data object PokemonList : PokemonRoute
+//
+//    @Serializable
+//    data class PokemonDetail(val pokemonId: Int) : PokemonRoute
+//}
 
 //val pokemons = listOf(
 //    Pokemon(1, "이상해씨", "풀/독", "태어날 때부터 등에 식물의 씨앗이 있어 조금씩 자란다."),
@@ -101,50 +103,5 @@ fun MainScreen(
         )
     }
 }
-@Composable
-fun PokemonListScreen(
-    repository: PokemonRepository,
-    viewModel: PokemonListViewModel = viewModel {
-        PokemonListViewModel(repository)
-    },
-    onNavigateToDetail: (Int) -> Unit,
-) {
-    //1. 이렇게 하면 list목록 자체가 아니라, StateFlow를 가져온다.
-    //val pokemonList = viewModel.pokemonList
 
-    //2.그래서 statflow 안의 목록화면에서 사용하고, 변경될때 화면도 갱신되도록 연결
-    val pokemonList by viewModel.pokemonList.collectAsStateWithLifecycle()
-    LazyColumn {
-        items(pokemonList) { pokemon ->
-            Button(
-                onClick = {
-                    onNavigateToDetail(pokemon.id)
-                }
-            ) {
-                Text(pokemon.name)
-            }
-        }
-    }
-}
 
-@Composable
-fun PokemonDetailScreen(
-    pokemonId: Int,
-    repository: PokemonRepository,
-    viewModel: PokemonDetailViewModel = viewModel {
-        PokemonDetailViewModel(
-            repository = repository,
-            pokemonId = pokemonId
-        )
-    }
-){
-//    //viewmodel를 만든후, 검색함수를 호출할때 id 전달
-//    val pokemon = viewModel.getPokemonById(pokemonId)
-//
-//    //포켓몬이 있을때만 설명을 표시
-//    pokemon?.let { Text(it.info)}
-
-    val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
-
-    Text(pokemon.name)
-}
