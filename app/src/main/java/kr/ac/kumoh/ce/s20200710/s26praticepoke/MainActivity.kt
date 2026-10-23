@@ -116,10 +116,18 @@ fun PokemonListScreen(
 @Composable
 fun PokemonDetailScreen(
     pokemonId: Int,
-    viewModel: PokemonDetailViewModel = viewModel(),
+    //viewModel: PokemonDetailViewModel = viewModel(),
+    viewModel: PokemonDetailViewModel = viewModel {
+        PokemonDetailViewModel(pokemonId)
+    }
 ){
-    val pokemon = viewModel.getPokemonById(pokemonId)
+//    //viewmodel를 만든후, 검색함수를 호출할때 id 전달
+//    val pokemon = viewModel.getPokemonById(pokemonId)
+//
+//    //포켓몬이 있을때만 설명을 표시
+//    pokemon?.let { Text(it.info)}
 
-    //포켓몬이 있을때만 설명을 표시
-    pokemon?.let { Text(it.info)}
+    val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
+
+    Text(pokemon.name)
 }

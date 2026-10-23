@@ -21,8 +21,14 @@ class PokemonListViewModel : ViewModel() {
 }
 
 //특정 포켓몬 찾기
-class PokemonDetailViewModel : ViewModel() {
+class PokemonDetailViewModel(private val pokemonId: Int) : ViewModel() {
 
+    private val _pokemon = MutableStateFlow(
+        pokemons.find { it.id == pokemonId }
+            ?: Pokemon(-1, "알수 없음", "없음", "Unknown")
+    )
+
+    val pokemon = _pokemon.asStateFlow()
     // 전체 목록 중 전달 받은 번호와 일치하는 포켓몬 한마리를 찾아라.
     fun getPokemonById(id: Int): Pokemon? {
         return pokemons.find { it.id == id }
