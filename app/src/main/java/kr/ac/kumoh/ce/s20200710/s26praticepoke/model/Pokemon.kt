@@ -5,6 +5,7 @@ data class Pokemon(
     val name: String,
     val type: String,
     val info: String,
+    val image: String,
 )
 
 // Pokemon(25, "피카츄", "전기", "뺨에 전기 주머니가 있다.")
