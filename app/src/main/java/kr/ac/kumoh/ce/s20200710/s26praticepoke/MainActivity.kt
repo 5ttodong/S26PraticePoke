@@ -36,6 +36,8 @@ import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.viewmodel.PokemonListViewModel
 import java.util.Map.entry
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.navigation.PokemonRoute
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.repository.ApiPokemonRepository
+
 //sealed interface PokemonRoute : NavKey {
 //    @Serializable
 //    data object PokemonList : PokemonRoute
@@ -56,8 +58,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val repository: PokemonRepository = MockPokemonRepository()
+        //val repository: PokemonRepository = MockPokemonRepository()
 
+        //이게 내가만든 정보 말고, 인터넷 서버에 있는 걸 가져온다.
+        val repository = ApiPokemonRepository()
         setContent {
             S26PraticePokeTheme {
                 MainScreen(repository)
