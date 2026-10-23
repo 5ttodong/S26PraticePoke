@@ -14,8 +14,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -93,7 +95,11 @@ fun PokemonListScreen(
     onNavigateToDetail: (Int) -> Unit,
     viewModel: PokemonListViewModel = viewModel()
 ) {
-    val pokemonList = viewModel.pokemonList
+    //1. 이렇게 하면 list목록 자체가 아니라, StateFlow를 가져온다.
+    //val pokemonList = viewModel.pokemonList
+
+    //2.그래서 statflow 안의 목록화면에서 사용하고, 변경될때 화면도 갱신되도록 연결
+    val pokemonList by viewModel.pokemonList.collectAsStateWithLifecycle()
     LazyColumn {
         items(pokemonList) { pokemon ->
             Button(
