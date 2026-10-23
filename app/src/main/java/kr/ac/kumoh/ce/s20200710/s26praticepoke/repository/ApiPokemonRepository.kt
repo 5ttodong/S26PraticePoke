@@ -6,6 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.json.Json
 import kr.ac.kumoh.ce.s20200710.s26praticepoke.model.Pokemon
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.model.PokemonAbility
+import kr.ac.kumoh.ce.s20200710.s26praticepoke.model.PokemonStat
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -77,8 +79,29 @@ class ApiPokemonRepository(
             name = speciesDto?.koreanName ?: dto.name,
             type = types,
             info = speciesDto?.koreanInfo.orEmpty(),
-            image = dto.sprites.frontDefault ?: ""
+            image = dto.sprites.frontDefault ?: "",
+
+            // 추가 키, 몸무게
+            height = dto.height / 10.0,
+            weight = dto.weight / 10.0,
+
+            // 기본 능력치
+            stats = dto.stats.map {
+                PokemonStat(
+                    name = it.stat.name,
+                    value = it.baseStat
+                )
+            },
+
+            // AI 도움 특성
+            abilities = dto.abilities.map {
+                PokemonAbility(
+                    name = it.ability.name,
+                    isHidden = it.isHidden
+                )
+            }
         )
+
     }
 }
 // 한국어 이름은 모든 종에 대해 하나씩 존재한다
