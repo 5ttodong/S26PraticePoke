@@ -1,5 +1,6 @@
 package kr.ac.kumoh.ce.s20200710.s26praticepoke.ui.screen
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,5 +28,10 @@ fun PokemonDetailScreen(
 
     val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
 
-    Text(pokemon.name)
+    Column(
+
+    ) {
+        Text(pokemon.name)
+        Text(pokemon.info)
+    }
 }
